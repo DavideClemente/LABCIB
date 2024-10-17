@@ -5,7 +5,7 @@ import string
 import timeit
 
 # Configure serial connection
-arduino_port = 'COM10'  # Adjust to your port, e.g., '/dev/ttyUSB0' for Linux
+arduino_port = 'COM7'  # Adjust to your port, e.g., '/dev/ttyUSB0' for Linux
 baud_rate = 115200
 timeout_duration = .5  # Set timeout duration
 
@@ -51,13 +51,21 @@ def crack_password(password_length):
         for char in charset:
             # Build the test password: correct characters + current guess + padding
             test_password = guessed_password + char + "a" * (password_length - len(guessed_password) - 1)
-            response_time = measure_response_time(test_password, repeat=20)
 
-            print(f"Trying: {test_password}, Time: {response_time:.6f} seconds")
+            ser.readline()
+            passw = f"{test_password}\n".encode()
+            initial = time.perf_counter()
+            ser.write(passw)
+            ser.read(1)
+            final_time = time.perf_counter()
+            interval = final_time - initial
+            ser.readline()
+
+            print(f"Trying: {test_password}, Time: {interval:.6f} seconds")
 
             # If this character produced the longest response time, consider it the correct one
-            if response_time > best_time:
-                best_time = response_time
+            if interval > best_time:
+                best_time = interval
                 best_char = char
 
         # Add the best character for this position to the guessed password
@@ -69,12 +77,13 @@ def crack_password(password_length):
 
 
 try:
-    send_data('')  # Skip prompt for password
+    #send_data('')  # Skip prompt for password
     time.sleep(2)
 
     print(f'Arduino says: {read_response()}')
+    print(ser.in_waiting)
 
-    password_length = 7
+    password_length = 13
     cracked_password = crack_password(password_length)
 
     print(f"Detected password: {cracked_password}")
