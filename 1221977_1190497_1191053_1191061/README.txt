@@ -21,7 +21,7 @@ Como Usar o Código:
 
 Dependências: O programa requer Python 3.x e as bibliotecas PySerial e Matplotlib. Pode instalá-las com os seguintes comandos:
 
-pip install pyserial matplotlib
+"pip install pyserial matplotlib"
 
 Explicação do Código para Descobrir a Password:
 Depois de determinar o comprimento da password, usamos um segundo script para descobrir os caracteres. O funcionamento é semelhante ao anterior, mas desta vez o script tenta cada letra ('a' a 'z') em cada posição da password, medindo o tempo de resposta de cada tentativa.
