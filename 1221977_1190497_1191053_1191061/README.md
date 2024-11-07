@@ -81,23 +81,51 @@ Este projeto exemplifica como timing attacks podem ser usados para descobrir uma
 
 ## Firmware
 
-### Dump das regiões de memória
+### Memory Dump
+
+Após a descoberta da password, foi possível listar as regiões de memória do arduino, bem como aceder ao seu conteúdo.
+Através do script `dump_mem.py` foi possível extrair a memória das três regiões (EEPROM, PROGMEM, SRAM) para ficheiros binários.
 
 ## Confidential Information
 
--   `Descobrir a password do alan`
+Tendo acesso aos conteúdos em memória da máquina, em específico da região PROGMEM, foi possível identificar algumas credenciais expostas:
+
+-   Username e password do Dan (Developer): dankmlacoguqo
+-   Username e password do Alan (Admin): alancusxrgsmqehqnjoowytbultpxchcmjguerwsiabwskptfiqcls
+
+Com a descoberta da password do administrador foi possível aceder à consola de admin, levando ao próximo desafio: descobrir a password do C&C.
 
 ## Identify Cryptographic Assets
 
--   `retirar key e signature para depois decrypt`
+Ainda relativamente aos conteúdos expostos da região PROGMEM, foi também possível identificar dois registos criptográficos que poderiam ser relevantes para o processo de acesso ao C&C.
+
+Assim, após alguma análise, concluímos que se tratavam de uma chave privada e de uma mensagem cifrada relativo a um protocolo de criptografia de chaves públicas (criptografia assimétrica), mais específicamente o protocolo RSA.
 
 ## Find the pot of gold
 
--   `openssl base64 -d -in encrypted.txt -out encrypted.bin`
+Tendo descoberto estas informações, iniciamos uma pesquisa acerca de ferramentas que permitissem a desencriptação da mensagem aproveitando a chave privada.
+Assim, concluímos que a ferramenta **openssl**, presente na maioria das distribuições _linux-based_, permitiria obter a mensagem desencriptada.
+Para isso foi necessário executar os passos seguintes:
 
--   `openssl rsautl -decrypt -inkey private_key.pem -in encrypted.bin -out decrypted.txt`
--   rainbow table
+-   Criar um ficheiro `.pem` contendo a chave privada e adicionando o cabeçalho e rodapé existentes numa chave RSA.
+-   Criar um ficheiro `.txt` contendo o conteudo encriptado da mensagem
+-   Executar os comandos seguintes:
+
+    -   `openssl base64 -d -in encrypted.txt -out encrypted.bin`
+
+    -   `openssl rsautl -decrypt -inkey private_key.pem -in encrypted.bin -out decrypted.txt`
+
+Após a execução dos comandos, foi possível obter uma hash (mensagem desencriptada). Fazendo uso da _rainbow table_ fornecida pelos professores, retirámos a mensagem original correspondente à hash.
+Esta mensagem revelou-se ser a password do C&C.
 
 ## Crack the code
 
+O último obstáculo para descobrir o segredo final era descobrir um código de uso único.
+Segundo o enunciado, a equipa de reverse engineering tinha encontrado um bug no qual os códigos se começavam a repetir ao fim de algumas tentativas.
+Sendo que essa era a nossa única _hint_, decidimos seguir essa abordagem e criar um script `otpCracker.py`.
+Este script regista todos os códigos que vão sendo gerados pela máquina, e quando deteta uma repetição, significa que já sabemos qual será o próximo código.
+Esta etapa revelou-se bastante aleatória em termos temporais, podendo a repetição acontecer ao fim de 10, 15 ou até 20 minutos.
+
 ## Connect to the C&C
+
+Com o código de uso único descoberto foi então possível aceder ao segredo final **sailducknailisland**!
