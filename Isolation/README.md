@@ -20,7 +20,18 @@ After creating the tar file, we can use the `tar` cli tool to decompress the con
 -   `tar -xvf insecure1.tar -C insecure1`
 
 Navigating inside the /app folder, we can already see the `.env` file and it's content
-
 ![.env file](images/env_file.jpg)
-
 ![.env file content](images/envFileContent.jpg)
+
+An alternative approach is to pull the image and run it in an interactive shell, which allows us to examine the container's environment and potentially explore or test security settings. To do this, run the following commands:
+
+ - `docker pull isepdei/insecurelabs01:latest`
+ - `docker run -it isepdei/insecurelabs01:latest /bin/sh`
+ - `cat .env`
+Additionally, we can simply copy the contents of the .env file to a new file for further inspection. To do this, locate the container ID of the running container and then copy the file from the container to our local system:
+
+ - `docker ps`
+ - `docker cp <container_id>:/app/.env <local_path>/.env `
+  
+After executing these commands, we can review the contents of the .env file.
+
