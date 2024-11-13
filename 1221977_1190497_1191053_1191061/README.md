@@ -24,6 +24,8 @@ Os **_Timing attacks_** permitem avaliar o tempo de execução de uma determinad
 ### Determinação do Comprimento da Password
 
 Para encontrar o comprimento correto da password, foi desenvolvido um _script_ que enviava _strings_ (constituídas por vários carateres iguais) de diferentes comprimentos para o Arduino, de forma a simular uma tentativa de _login_. Após receber a resposta do Arduino a indicar que a tentativa de _login_ tinha sido falhada, o _script_ imprimia os tempos de execução de cada uma das tentativas, de modo a ser possível avaliar qual dos _inputs_ despoletava um maior tempo de execução.
+Para facilitar a validação dos resultados, foi gerado o gráfico abaixo, que apresenta os diferentes tamanhos de senha classificados por relevância. A organização segue uma ordem decrescente de tempo de resposta, atribuindo maior pontuação e relevância aos tamanhos de senha com pontuações mais elevadas, indicando a provável extensão da senha:
+![image info](./figures/password_length_graph.png)
 
 Após algumas tentativas, foi possível concluir que o Arduino demorarav mais tempo a enviar resposta quando o input podduía **13 carateres**, sendo esse o comprimento da password.
 
