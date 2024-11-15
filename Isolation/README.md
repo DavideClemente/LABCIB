@@ -83,3 +83,57 @@ In order to remove the `cap_net_raw` capability from the `ping` command, we issu
 After this operation, trying to execute a ping command resulted in the following error:
 
 -   `ping: => missing cap_net_raw+p capability or setuid?`
+-   
+
+### Question 12
+
+By executing the command `docker exec captest sh -c 'grep Cap /proc/1/status'` we can see the of the inheritable, permitted and effective capabilities of a process running in the container.
+This is the output of the command:
+![proc status](images/procResult.png)
+
+This command outputs the capabilities of the process running in the container with the following format:
+
+```
+CapInh: 0000000000000000
+CapPrm: 000001ffffffffff
+CapEff: 000001ffffffffff
+CapBnd: 000001ffffffffff
+CapAmb: 0000000000000000
+```
+
+The `CapInh` field shows the inheritable capabilities of the process, the `CapPrm` field shows the permitted capabilities of the process and the `CapEff` field shows the effective capabilities of the process.
+
+The `CapBnd` field shows the bounding capabilities of the process, and the `CapAmb` field shows the ambient capabilities of the process.
+
+
+After that ,to decode the output of each capability field the command `docker exec captest sh -c 'capsh --decode=00000000a80425fb'
+` can be used and by doing that we can see that:
+
+- The CapInh shows that the container does not have any inheritable capabilities
+- The CaPPrm,CaPPeff,CaPBnd are encoded the same way which means the permitted, effective and bounding capabilities of the container are the following:
+  ![permitted capabilities](images/permittedCapabilities.png)
+- The CapAmbs shows that the container does not have any ambient capabilities
+
+If we compared this result with the result obtained with the command `docker exec captest sh -c 'capsh --print'` we can see that it provides a more human-readable breakdown of the capabilities representing the same result obtained with the command `docker exec captest sh -c 'grep Cap /proc/1/status'`
+![capsh](images/capsh.png)
+
+### Question 13
+
+By running the container with the command `docker run --name captest --cap-drop all -d -p 8000:80 isepdei/capabilities01
+` we drop all capabilities from the container including the `cap_net_raw` capability used by the ping command.
+After that if we try to execute the ping command (e.g `docker exec captest sh -c 'ping www.dei.isep.ipp.pt'`) we get the following error:
+
+- `ping: socket: Operation not permitted`
+![ping error](images/ping_drop_all.png)
+
+
+This error indicates that the container does not have the `cap_net_raw` capability, which means that the ping command cannot use the raw socket to send ICMP echo requests.
+
+In order to fix this issue, we can use the `--cap-add` flag to add the `cap_net_raw` capability to the container and still drop all other capabilities.
+By running the container with the command `docker run --name captest --cap-add=cap_net_raw --cap-drop all -d -p 8000:80 isepdei/capabilities01
+` we add the `cap_net_raw` capability to the container and drop all other capabilities.
+After that if we try to execute the ping command (e.g `docker exec captest sh -c 'ping www.dei.isep.ipp.pt'`) we get the following output:
+
+![ping output](images/ping_add_cap_net_raw.png)
+
+This output indicates that the ping command can now use the raw socket to send ICMP echo requests. Additionally, this approach ensures that we follow the principle of least privilege.
