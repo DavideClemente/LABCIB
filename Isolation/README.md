@@ -137,3 +137,30 @@ After that if we try to execute the ping command (e.g `docker exec captest sh -c
 ![ping output](images/ping_add_cap_net_raw.png)
 
 This output indicates that the ping command can now use the raw socket to send ICMP echo requests. Additionally, this approach ensures that we follow the principle of least privilege.
+
+### Question 14
+
+According to the docker documentation, the `--privileged` flag gives all capabilities to the container, and it also lifts all the limitations enforced by the device cgroup controller.
+This means that when we run docker with the command `docker run -d --privileged -p 80:80 isepdei/insecurelabs03` the container is given all capabilities. If we output the capabilities with command `>docker exec beeaadbc9d4934745ea1cda47f395a3774d61f96787e57647a572369a0a25ddc sh -c "capsh --print"` with `beeaadbc9d4934745ea1cda47f395a3774d61f96787e57647a572369a0a25ddc` being the container ID, we can see that the container has all capabilities:
+![privileged](images/privileged.png)
+
+These includes critical capabilities such as:
+
+- `cap_sys_admin`: Allows control over many system-level configurations, effectively granting superuser-like privileges.
+- `cap_net_admin` & `cap_net_raw`: Allow manipulating network settings and creating raw sockets.
+- `cap_sys_rawio`: Grants access to low-level I/O operations on devices, enabling interaction with the host's hardware directly.
+- `cap_sys_ptrace`: Enables debugging and inspecting processes, which could lead to leaking sensitive information from the host.
+- `cap_sys_module`: Allows loading/unloading kernel modules, which can alter the kernel behavior of the host.
+
+
+### Question 15
+
+Since `fdisk` is installed in the container, and since we are running the docker with the `--privileged` flag, we can use the `docker exec` command to execute it inside the container:
+
+-   `docker exec insecurelabs03 fdisk -l`
+
+![fdisk](images/fdisk.png)
+
+This allows us to see the partitions of the host system, which can be used to gain access to the host's file system.
+
+TODO: Add a note explaining how we can then leverage this information to do an attack
