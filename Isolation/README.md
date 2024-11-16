@@ -190,7 +190,7 @@ With this we would be able to read the files of the host such as for example `/e
 
 ### Question 17
 
-Ensuring the security of Docker containers is crucial to preventing unauthorized access and data breaches. Therefore some of the best practices for securing Docker containers include:
+Ensuring the security of Docker containers is crucial to preventing unauthorized access and data breaches. Therefore some of the best practices for securing Docker containers include (https://spacelift.io/blog/docker-security):
 
 -   Keeping the container image up-to-date with the latest security patches and updates.
 -   Regularly scan images for vulnerabilities such as JFrog,Clair or Trivy.
