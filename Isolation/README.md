@@ -182,3 +182,24 @@ After that we  can mount the container file system with the command `mount /dev/
 With this we would be able to read the files of the host such as for example `/etc/passwd`, the security configuration files or navigate to the `\var` directory and read the content of the system and application logs.
 ![read passwd](images/passwdContent.png)
 
+
+
+
+### Question 16
+
+
+### Question 17
+
+Ensuring the security of Docker containers is crucial to preventing unauthorized access and data breaches. Therefore some of the best practices for securing Docker containers include:
+
+-   Keeping the container image up-to-date with the latest security patches and updates.
+-   Regularly scan images for vulnerabilities such as JFrog,Clair or Trivy.
+-   Remove unnecessary packages and services from the image. For example, using a scenario of this lab class, services such as `fdisk` are not needed in the container. This will ensure that the container image is minimal and therefore it will reduce the attack surface.
+-   Avoid running containers with unnecessary privileges (--privileged flag). Containers should only run with the minimum privileges required to perform their intended function. Therefore, capabilities should be dropped from the container.
+-   Use read-only file systems (--read-only flag) to protect container files.
+-   Prevent containers from escalating privileges by using the --security-opt flag with the no-new-privileges option. This will ensure that setuid and setgid will have no effect on the container.
+-   Avoid exposing the docker socket and when needed ensure that it is only exposed via TLS.
+-   Use firewall rules or Docker network modes to restrict communication between containers.
+-   Store sensitive data like passwords or API keys in Docker Secrets rather than hardcoding them into images or environment variables.
+-   Enable logging for container activity and integrate it with centralized log management tools like Prometheus.
+-   Set limits for CPU, memory, and disk usage to prevent containers from consuming excessive resources.
