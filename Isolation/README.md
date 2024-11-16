@@ -163,4 +163,22 @@ Since `fdisk` is installed in the container, and since we are running the docker
 
 This allows us to see the partitions of the host system, which can be used to gain access to the host's file system.
 
-TODO: Add a note explaining how we can then leverage this information to do an attack
+So from here we can see that there is a partition with the name `/dev/sda`. Then if we execute the docker in interactive mode with the command `docker run -it --privileged -p 80:80 isepdei/insecurelabs03` we can see the `/dev/sda` partition mounted in the container.
+![mount](images/mount.png)
+
+We can then use the `fdisk` command to see the partitions of the container's file system:
+
+-   `docker exec insecurelabs03 fdisk -l`
+
+![fdisk](images/fdisk2.png)
+
+This allows us to see the partitions of the container's file system, which can be used to gain access to the container's file system.
+
+Now if we execute the docker container in interactive mode with the command `docker run -it --privileged -p 80:80 --name labcib isepdei/insecurelabs03 bash`  we can run commands inside the container.
+
+One of this commands is `mkdir -p /mnt/test` which creates a directory in the container's file system.
+After that we  can mount the container file system with the command `mount /dev/sda1 /mnt/test` and then we would gain  access to filesystem of the host. 
+![gain access](images/gainAccess.png)
+With this we would be able to read the files of the host such as for example `/etc/passwd`, the security configuration files or navigate to the `\var` directory and read the content of the system and application logs.
+![read passwd](images/passwdContent.png)
+
